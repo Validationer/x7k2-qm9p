@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#294B76">
+<title>TP357 Monitor · HP</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#EDF2F6;--card:#FFFFFF;--border:#D8E2EA;--line:#E5ECF1;--ink:#1F2C3A;--muted:#566677;--faint:#7C8B99;--tile:#F3F7FA;
+  --primary:#2F6BA8;--primaryInk:#fff;--okBg:#DDEFE5;--okTxt:#2B6B4D;--warnBg:#FBF4E3;--warnTxt:#7D5A12;--bad:#A8473B;--badBg:#F7E1DC;--selBg:#E4EEF8;
+}
+@media (prefers-color-scheme:dark){:root{
+  color-scheme:dark;
+  --bg:#0F1620;--card:#17212E;--border:#26364A;--line:#202D3E;--ink:#E2E9F0;--muted:#A2B1C1;--faint:#7A8A9C;--tile:#1C2837;
+  --primary:#74B1E6;--primaryInk:#0F1620;--okBg:rgba(93,195,152,.15);--okTxt:#6FD0A5;--warnBg:rgba(232,190,95,.12);--warnTxt:#E5C375;--bad:#F08C7E;--badBg:rgba(229,120,106,.14);--selBg:#1E3350;
+}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.45;min-height:100vh;display:flex;flex-direction:column;-webkit-text-size-adjust:100%}
+button,input,select{font:inherit;color:inherit}
+header{background:linear-gradient(115deg,#294B76 0%,#336397 55%,#3F7FAE 100%);color:#fff;padding:16px;display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo img{width:34px;height:34px;object-fit:contain}
+.ht{display:flex;flex-direction:column;gap:1px;flex-grow:1}
+.ht b{font-size:17px;font-weight:800}
+.ht span{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#CFDDEB}
+.gear{width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+main{flex-grow:1;padding:16px;display:flex;flex-direction:column;gap:14px;max-width:560px;width:100%;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0;font-size:15px;font-weight:800}
+.pill{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;font-weight:700;font-size:13px}
+.pill.ok{background:var(--okBg);color:var(--okTxt)}
+.pill.warn{background:var(--warnBg);color:var(--warnTxt)}
+.pill.bad{background:var(--badBg);color:var(--bad)}
+.note{display:flex;gap:10px;padding:11px 14px;border-radius:12px;background:var(--warnBg);color:var(--warnTxt);font-size:13px}
+.btn{min-height:52px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--primary);font-weight:800;font-size:16px;cursor:pointer;padding:0 16px}
+.btn.pri{background:var(--primary);border-color:var(--primary);color:var(--primaryInk)}
+.btn.bad{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+.sensor{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--tile);border:1px solid var(--border)}
+.sensor .ic{width:36px;height:36px;border-radius:10px;background:var(--okBg);color:var(--okTxt);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sensor .t{display:flex;flex-direction:column;flex-grow:1;min-width:0}
+.sensor .t b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sensor .t span{font-size:12px;color:var(--faint)}
+.chk{display:flex;align-items:center;gap:12px;min-height:50px;cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--primary);flex-shrink:0}
+.chk .l{display:flex;flex-direction:column}
+.chk .l b{font-weight:700}
+.chk .l span{font-size:12px;color:var(--faint)}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:12px;font-weight:700;color:var(--muted)}
+.fld input,.fld select{min-height:48px;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--tile);width:100%}
+.bar{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--primary);border-radius:6px;transition:width .3s}
+.step{display:flex;align-items:center;gap:12px;min-height:58px;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.step .dot{width:32px;height:32px;border-radius:10px;background:var(--tile);color:var(--faint);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:800;font-size:13px}
+.step.run .dot{background:var(--selBg);color:var(--primary)}
+.step.ok .dot{background:var(--okBg);color:var(--okTxt)}
+.step.err .dot{background:var(--badBg);color:var(--bad)}
+.step .t{display:flex;flex-direction:column;flex-grow:1;min-width:0}
+.step .t span{font-size:12px;color:var(--faint)}
+.log{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--muted);background:var(--tile);border:1px solid var(--border);border-radius:14px;padding:12px 14px;max-height:180px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.big{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto}
+.center{text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.row{display:flex;align-items:center;min-height:48px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row b{flex-grow:1}
+.row span{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--muted)}
+.hidden{display:none!important}
+.small{font-size:12.5px;color:var(--muted)}
+footer{padding:12px 16px 18px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;font-size:11.5px;color:var(--faint)}
+footer b{color:var(--ink)}
+.spin{display:inline-block;width:16px;height:16px;border:2.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:r .7s linear infinite;vertical-align:-3px}
+@keyframes r{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><img id="logoImg" alt="Logo Eka Jaya Internasional"></div>
+  <div class="ht"><b>TP357 Monitor</b><span>PT. EKA JAYA INTERNASIONAL</span></div>
+  <button class="gear" id="btnGear" aria-label="Pengaturan"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</header>
+
+<main>
+  <!-- Pengaturan -->
+  <section id="vSet" class="hidden" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <h2>Pengaturan</h2>
+      <div class="fld"><label for="inUrl">URL server (API)</label><input id="inUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/.../exec"></div>
+      <div class="fld"><label for="inTok">Token perangkat ini</label><input id="inTok" type="password" autocomplete="off"></div>
+      <div class="fld"><label for="inDash">URL dashboard (opsional)</label><input id="inDash" type="url" inputmode="url" autocomplete="off"></div>
+      <div class="fld"><label for="inOp">Nama operator</label><input id="inOp" type="text" autocomplete="off" maxlength="40"></div>
+      <button class="btn pri" id="btnSave">Simpan dan tes koneksi</button>
+      <div id="setMsg" class="small" role="status"></div>
+    </div>
+  </section>
+
+  <!-- Siap -->
+  <section id="vMain" class="hidden" style="display:flex;flex-direction:column;gap:14px">
+    <div id="srvPill" class="pill warn" role="status">Memeriksa server…</div>
+    <div id="noBt" class="pill bad hidden">Browser ini tidak mendukung Web Bluetooth. Pakai Chrome di Android, atau Bluefy di iPhone.</div>
+    <div class="card">
+      <h2>Sensor</h2>
+      <div id="sensorBox" class="sensor hidden">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></div>
+        <div class="t"><b id="sName">–</b><span id="sSub">–</span></div>
+      </div>
+      <div id="mapBox" class="hidden" style="display:flex;flex-direction:column;gap:10px">
+        <div class="small" id="mapHint">Ini sensor yang mana?</div>
+        <div class="fld"><label for="selMap">Sensor terdaftar</label><select id="selMap"></select></div>
+        <div class="fld hidden" id="newMacBox"><label for="inMac">Alamat MAC sensor (di aplikasi PC atau di label)</label><input id="inMac" placeholder="AA:BB:CC:DD:EE:01" autocapitalize="characters"></div>
+        <button class="btn" id="btnMapOk" style="min-height:46px;font-size:14px">Simpan pilihan</button>
+      </div>
+      <button class="btn" id="btnPick">Pilih sensor</button>
+    </div>
+    <div class="card">
+      <h2>Jenis data</h2>
+      <label class="chk"><input type="checkbox" id="cDay" checked><span class="l"><b>Harian</b><span>per menit, 24 jam terakhir</span></span></label>
+      <label class="chk"><input type="checkbox" id="cWeek" checked><span class="l"><b>Mingguan</b><span>per jam, 7 hari terakhir</span></span></label>
+      <label class="chk"><input type="checkbox" id="cYear"><span class="l"><b>Tahunan</b><span>per jam, 365 hari (lebih lama, beberapa menit)</span></span></label>
+    </div>
+    <div class="note"><span>Tutup aplikasi ThermoPro dan dekatkan HP ke sensor sebelum menarik data.</span></div>
+    <button class="btn pri" id="btnGo" disabled>Tarik dan kirim</button>
+  </section>
+
+  <!-- Progres -->
+  <section id="vProg" class="hidden" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <div style="display:flex;align-items:baseline;gap:8px"><h2 id="pName">–</h2><span class="small" id="pState">menarik…</span></div>
+      <div class="bar"><i id="pBar"></i></div>
+      <div class="small">Jangan tutup halaman ini dan jauhkan HP dari sensor.</div>
+    </div>
+    <div class="card" id="pSteps" style="padding-top:6px;padding-bottom:6px"></div>
+    <div class="log" id="pLog" aria-live="polite"></div>
+    <button class="btn bad" id="btnCancel">Batal</button>
+  </section>
+
+  <!-- Selesai -->
+  <section id="vDone" class="hidden" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card center" style="padding:24px 16px">
+      <div class="big" id="dIcon"></div>
+      <h2 id="dTitle" style="font-size:20px">–</h2>
+      <span class="small" id="dSub">–</span>
+    </div>
+    <div class="card" id="dRows" style="padding-top:4px;padding-bottom:4px"></div>
+    <div class="log hidden" id="dErr"></div>
+    <button class="btn pri" id="btnDash">Buka dashboard</button>
+    <button class="btn hidden" id="btnRetry">Kirim ulang yang gagal</button>
+    <button class="btn" id="btnAgain">Tarik sensor lain</button>
+  </section>
+</main>
+
+<footer>
+  <span>PT. Eka Jaya Internasional · TP357 Monitor v1.0</span>
+  <span>Dibuat oleh <b>Muhamad Fadhilah</b></span>
+</footer>
+
+<script>
+'use strict';
+/* ====== Konstanta protokol TP357 (sama dengan pustaka tpy357) ====== */
+var SVC = '00010203-0405-0607-0809-0a0b0c0d1910';
+var CH_R = '00010203-0405-0607-0809-0a0b0c0d2b10';
+var CH_W = '00010203-0405-0607-0809-0a0b0c0d2b11';
+var MIN = 60000, HOUR = 3600000, DAY = 86400000, CHUNK = 1500;
+var MODES = {
+  day:  { label: 'Harian',   desc: 'per menit', cmd: [0xa7, 0, 0, 0, 0, 0x7a], step: MIN,  floor: MIN,  back: function (n) { return n - (DAY - MIN); },        timeout: 120000 },
+  week: { label: 'Mingguan', desc: 'per jam',   cmd: [0xa6, 0, 0, 0, 0, 0x6a], step: HOUR, floor: HOUR, back: function (n) { return n - (7 * DAY + HOUR); },   timeout: 120000 },
+  year: { label: 'Tahunan',  desc: 'per jam',   cmd: [0xa8, 0, 0, 0, 0, 0x8a], step: HOUR, floor: HOUR, back: function (n) { return n - (365 * DAY - HOUR); }, timeout: 300000 }
+};
+
+/* Satu paket notifikasi berisi 5 rekaman. Mengembalikan 'end' pada paket penutup (0xC2). */
+function parsePacket(dv, mode, t0, out) {
+  var m = MODES[mode], b0 = dv.getUint8(0);
+  if (b0 === 0xC2) return 'end';
+  if (b0 !== m.cmd[0] || dv.byteLength < 7) return null;
+  var raw = dv.getInt16(1, true);
+  for (var i = 0; i < 5; i++) {
+    var ofs = 4 + i * 3;
+    if (ofs + 2 >= dv.byteLength) break;
+    var t = dv.getInt16(ofs, true), h = dv.getUint8(ofs + 2);
+    if (t > 1024 || h > 100) continue;
+    var ts = t0 + (5 * (raw - 1) + i) * m.step;
+    out.push([Math.floor(ts / m.floor) * m.floor, t / 10, h]);
+  }
+  return null;
+}
+function cleanRows(rows) {
+  rows.sort(function (a, b) { return a[0] - b[0]; });
+  var o = [];
+  for (var i = 0; i < rows.length; i++) { if (o.length && o[o.length - 1][0] === rows[i][0]) o[o.length - 1] = rows[i]; else o.push(rows[i]); }
+  return o.map(function (r) { return [new Date(r[0]).toISOString(), r[1], r[2]]; });
+}
+
+/* ====== Util ====== */
+function $(id) { return document.getElementById(id); }
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* abaikan */ } }
+function normMac(s) { var h = String(s || '').toUpperCase().replace(/[^0-9A-F]/g, ''); return h.length === 12 ? h.match(/.{2}/g).join(':') : ''; }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function fHM(t) { var d = new Date(t + 7 * HOUR); return ('0' + d.getUTCDate()).slice(-2) + '/' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + ' ' + ('0' + d.getUTCHours()).slice(-2) + ':' + ('0' + d.getUTCMinutes()).slice(-2); }
+
+var CFG = { url: lsGet('tp357.url') || '', token: lsGet('tp357.token') || '', dash: lsGet('tp357.dash') || '', op: lsGet('tp357.op') || '' };
+var MAP = {}; try { MAP = JSON.parse(lsGet('tp357.map') || '{}'); } catch (e) { MAP = {}; }
+var S = { device: null, mac: '', label: '', serverSensors: [], cancel: false, failed: [] };
+
+function show(id) { ['vSet', 'vMain', 'vProg', 'vDone'].forEach(function (v) { $(v).classList.toggle('hidden', v !== id); }); window.scrollTo(0, 0); }
+
+/* ====== Server ====== */
+function api(payload) {
+  var body = JSON.stringify(Object.assign({ token: CFG.token }, payload));
+  // text/plain menghindari preflight CORS; Apps Script menjawab dengan redirect yang boleh dibaca.
+  return fetch(CFG.url, { method: 'POST', body: body, redirect: 'follow' }).then(function (r) {
+    if (!r.ok) throw new Error('Server membalas HTTP ' + r.status);
+    return r.json();
+  }).then(function (j) { if (!j.ok) throw new Error(j.error || 'Server menolak permintaan'); return j; });
+}
+function checkServer() {
+  var p = $('srvPill');
+  if (!CFG.url || !CFG.token) { p.className = 'pill warn'; p.textContent = 'Isi URL server dan token di Pengaturan.'; return Promise.resolve(false); }
+  p.className = 'pill warn'; p.textContent = 'Memeriksa server…';
+  return api({ action: 'ping' }).then(function () { p.className = 'pill ok'; p.textContent = 'Server tersambung · token HP ini aktif'; return true; })
+    .catch(function (e) { p.className = 'pill bad'; p.textContent = 'Server tidak bisa dihubungi: ' + e.message; return false; });
+}
+
+/* ====== Pengaturan ====== */
+$('btnGear').addEventListener('click', function () {
+  $('inUrl').value = CFG.url; $('inTok').value = CFG.token; $('inDash').value = CFG.dash; $('inOp').value = CFG.op; $('setMsg').textContent = '';
+  show('vSet');
+});
+$('btnSave').addEventListener('click', function () {
+  CFG.url = $('inUrl').value.trim(); CFG.token = $('inTok').value.trim(); CFG.dash = $('inDash').value.trim(); CFG.op = $('inOp').value.trim();
+  lsSet('tp357.url', CFG.url); lsSet('tp357.token', CFG.token); lsSet('tp357.dash', CFG.dash); lsSet('tp357.op', CFG.op);
+  $('setMsg').textContent = 'Menguji koneksi…';
+  api({ action: 'ping' }).then(function () { $('setMsg').textContent = 'Tersambung. Pengaturan tersimpan.'; setTimeout(function () { show('vMain'); checkServer(); }, 700); })
+    .catch(function (e) { $('setMsg').textContent = 'Gagal: ' + e.message; });
+});
+
+/* ====== Pilih sensor ====== */
+function setReady() { $('btnGo').disabled = !(S.device && S.mac); }
+function suffixOf(name) { var m = /\(([0-9A-Fa-f]{4})\)/.exec(name || ''); return m ? m[1].toUpperCase() : ''; }
+
+function applySensor(mac, label) {
+  S.mac = mac; S.label = label;
+  $('sensorBox').classList.remove('hidden');
+  $('sName').textContent = label || mac;
+  $('sSub').textContent = (S.device.name || 'TP357') + ' · ' + mac;
+  $('mapBox').classList.add('hidden');
+  setReady();
+}
+function showMapping() {
+  var sel = $('selMap'), list = S.serverSensors;
+  sel.innerHTML = list.map(function (s) { return '<option value="' + esc(s.mac) + '">' + esc(s.label) + ' (' + esc(s.mac) + ')</option>'; }).join('') + '<option value="__new">Sensor baru (ketik MAC)</option>';
+  $('newMacBox').classList.toggle('hidden', list.length > 0);
+  if (!list.length) sel.value = '__new';
+  $('mapBox').classList.remove('hidden');
+  $('mapBox').style.display = 'flex';
+  $('mapHint').textContent = 'Nama "' + (S.device.name || '') + '" belum dikenali. Ini sensor yang mana?';
+}
+$('selMap').addEventListener('change', function () { $('newMacBox').classList.toggle('hidden', this.value !== '__new'); });
+$('btnMapOk').addEventListener('click', function () {
+  var v = $('selMap').value, mac, label;
+  if (v === '__new') { mac = normMac($('inMac').value); if (!mac) { alert('MAC harus 12 digit heksadesimal.'); return; } label = S.device.name || mac; }
+  else { mac = v; var s = S.serverSensors.filter(function (x) { return x.mac === v; })[0]; label = s ? s.label : v; }
+  MAP[S.device.id] = { mac: mac, label: label }; lsSet('tp357.map', JSON.stringify(MAP));
+  applySensor(mac, label);
+});
+
+$('btnPick').addEventListener('click', function () {
+  if (!navigator.bluetooth) { $('noBt').classList.remove('hidden'); return; }
+  navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'TP35' }], optionalServices: [SVC] }).then(function (dev) {
+    S.device = dev; S.mac = ''; S.label = '';
+    $('sensorBox').classList.remove('hidden'); $('sName').textContent = dev.name || 'TP357'; $('sSub').textContent = 'mencocokkan dengan daftar sensor…';
+    setReady();
+    var known = MAP[dev.id];
+    var go = known ? Promise.resolve([]) : api({ action: 'sensors' }).then(function (j) { return j.sensors || []; }).catch(function () { return []; });
+    return go.then(function (list) {
+      S.serverSensors = list;
+      if (known) return applySensor(known.mac, known.label);
+      var suf = suffixOf(dev.name), hit = suf ? list.filter(function (s) { return s.mac.replace(/:/g, '').slice(-4) === suf; }) : [];
+      if (hit.length === 1) { MAP[dev.id] = { mac: hit[0].mac, label: hit[0].label }; lsSet('tp357.map', JSON.stringify(MAP)); applySensor(hit[0].mac, hit[0].label); }
+      else showMapping();
+    });
+  }).catch(function (e) { if (e && e.name === 'NotFoundError') return; alert('Gagal memilih sensor: ' + (e && e.message || e)); });
+});
+
+/* ====== Tarik data dari sensor ====== */
+function pullBle(dev, mode, log) {
+  var m = MODES[mode], out = [];
+  var timer, abort;
+  var timeout = new Promise(function (_, rej) { timer = setTimeout(function () { rej(new Error('Waktu habis saat mengunduh data.')); }, m.timeout); });
+  var cancelled = new Promise(function (_, rej) { abort = setInterval(function () { if (S.cancel) rej(new Error('Dibatalkan.')); }, 300); });
+  var work = (async function () {
+    log('menyambung ke sensor…');
+    var server = await dev.gatt.connect();
+    var svc = await server.getPrimaryService(SVC);
+    var rc = await svc.getCharacteristic(CH_R), wc = await svc.getCharacteristic(CH_W);
+    var t0 = m.back(Date.now());
+    var done; var fin = new Promise(function (r) { done = r; });
+    var count = 0;
+    rc.addEventListener('characteristicvaluechanged', function (ev) {
+      var r = parsePacket(ev.target.value, mode, t0, out);
+      count++;
+      if (r === 'end') done();
+    });
+    await rc.startNotifications();
+    log('meminta data ' + m.label.toLowerCase() + '…');
+    await wc.writeValueWithoutResponse(new Uint8Array(m.cmd));
+    await fin;
+    try { await rc.stopNotifications(); } catch (e) { /* abaikan */ }
+    return cleanRows(out);
+  })();
+  return Promise.race([work, timeout, cancelled]).then(function (v) { clearTimeout(timer); clearInterval(abort); try { dev.gatt.disconnect(); } catch (e) { /* abaikan */ } return v; },
+    function (e) { clearTimeout(timer); clearInterval(abort); try { dev.gatt.disconnect(); } catch (e2) { /* abaikan */ } throw e; });
+}
+
+async function sendRows(mode, rows, log) {
+  var chunks = [];
+  for (var i = 0; i < rows.length; i += CHUNK) chunks.push(rows.slice(i, i + CHUNK));
+  if (!chunks.length) chunks.push([]);
+  for (var k = 0; k < chunks.length; k++) {
+    await api({ action: 'ingest', mac: S.mac, label: S.label, mode: mode, rows: chunks[k], final: k === chunks.length - 1, totalRows: rows.length, operator: CFG.op, device: 'HP · ' + (navigator.userAgent.indexOf('Android') > -1 ? 'Android' : 'Browser') });
+    log('terkirim ' + Math.min((k + 1) * CHUNK, rows.length) + '/' + rows.length + ' baris');
+  }
+}
+
+var RESULT = {};
+function logTo(s) { var l = $('pLog'); l.textContent += (l.textContent ? '\n' : '') + s; l.scrollTop = l.scrollHeight; }
+function renderSteps(modes, state) {
+  $('pSteps').innerHTML = modes.map(function (m, i) {
+    var st = state[m] || { s: 'wait', t: 'menunggu' };
+    var icon = st.s === 'ok' ? '✓' : st.s === 'err' ? '!' : st.s === 'run' ? '<span class="spin"></span>' : (i + 1);
+    return '<div class="step ' + st.s + '"><span class="dot">' + icon + '</span><div class="t"><b>' + MODES[m].label + '</b><span>' + esc(st.t) + '</span></div></div>';
+  }).join('');
+}
+
+async function runJob(modes, retryOnly) {
+  S.cancel = false; S.failed = []; RESULT = RESULT || {};
+  $('pLog').textContent = ''; $('pName').textContent = S.label || S.mac; $('pState').textContent = 'menarik…';
+  $('pBar').style.width = '0%';
+  var state = {}; renderSteps(modes, state); show('vProg');
+  var okCount = 0, total = modes.length;
+  for (var i = 0; i < modes.length; i++) {
+    var mode = modes[i];
+    state[mode] = { s: 'run', t: 'menarik dari sensor…' }; renderSteps(modes, state);
+    try {
+      var rows = (retryOnly && RESULT[mode] && RESULT[mode].rows) ? RESULT[mode].rows : null;
+      if (!rows) {
+        var tries = 0;
+        while (true) {
+          try { rows = await pullBle(S.device, mode, logTo); break; }
+          catch (e) { tries++; if (S.cancel || tries >= 2) throw e; logTo('coba lagi (' + e.message + ')'); await sleep(1500); }
+        }
+        if (!rows.length) throw new Error('Sensor mengirim data kosong.');
+        RESULT[mode] = { rows: rows };
+        logTo(rows.length + ' baris diterima dari sensor');
+      }
+      state[mode] = { s: 'run', t: rows.length + ' baris · mengirim ke server…' }; renderSteps(modes, state);
+      await sendRows(mode, rows, logTo);
+      RESULT[mode].sent = true;
+      state[mode] = { s: 'ok', t: rows.length.toLocaleString('id-ID') + ' baris · terkirim' }; okCount++;
+    } catch (e) {
+      state[mode] = { s: 'err', t: e.message }; S.failed.push({ mode: mode, msg: e.message }); logTo('GAGAL ' + MODES[mode].label + ': ' + e.message);
+      if (S.cancel) { for (var j = i + 1; j < modes.length; j++) state[modes[j]] = { s: 'wait', t: 'dibatalkan' }; renderSteps(modes, state); break; }
+    }
+    $('pBar').style.width = Math.round((i + 1) / total * 100) + '%'; renderSteps(modes, state);
+  }
+  finish(modes, state, okCount);
+}
+
+function finish(modes, state, okCount) {
+  var allOk = okCount === modes.length;
+  $('dIcon').style.background = allOk ? 'var(--okBg)' : 'var(--badBg)';
+  $('dIcon').style.color = allOk ? 'var(--okTxt)' : 'var(--bad)';
+  $('dIcon').innerHTML = allOk ? '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>' : '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v9M12 19h.01"/></svg>';
+  $('dTitle').textContent = allOk ? 'Data terkirim' : (okCount ? 'Sebagian terkirim' : 'Gagal');
+  $('dSub').textContent = allOk ? (S.label + ' sudah diperbarui di dashboard.') : 'Lihat rincian di bawah. Data di sensor tetap aman dan bisa ditarik lagi.';
+  $('dRows').innerHTML = modes.map(function (m) { var st = state[m] || { t: '-' }; return '<div class="row"><b>' + MODES[m].label + '</b><span>' + esc(st.t) + '</span></div>'; }).join('');
+  $('dErr').classList.add('hidden');
+  $('btnRetry').classList.toggle('hidden', !S.failed.length);
+  $('btnDash').classList.toggle('hidden', !CFG.dash);
+  show('vDone');
+}
+$('btnGo').addEventListener('click', function () {
+  var modes = []; if ($('cDay').checked) modes.push('day'); if ($('cWeek').checked) modes.push('week'); if ($('cYear').checked) modes.push('year');
+  if (!modes.length) { alert('Pilih minimal satu jenis data.'); return; }
+  if (!CFG.url || !CFG.token) { show('vSet'); return; }
+  RESULT = {}; S.lastModes = modes; runJob(modes, false);
+});
+$('btnCancel').addEventListener('click', function () { S.cancel = true; $('pState').textContent = 'membatalkan…'; });
+$('btnRetry').addEventListener('click', function () { var failed = S.failed.map(function (f) { return f.mode; }); runJob(failed, true); });
+$('btnAgain').addEventListener('click', function () { S.device = null; S.mac = ''; $('sensorBox').classList.add('hidden'); setReady(); show('vMain'); checkServer(); });
+$('btnDash').addEventListener('click', function () { if (CFG.dash) window.open(CFG.dash, '_blank'); });
+
+/* ====== Mulai ====== */
+(function init() {
+  var img = document.getElementById('logoImg'); img.src = 'logo.png'; img.onerror = function () { img.style.display = 'none'; };
+  if (!navigator.bluetooth) $('noBt').classList.remove('hidden');
+  if (!CFG.url || !CFG.token) { $('inUrl').value = CFG.url; show('vSet'); } else { show('vMain'); checkServer(); }
+  window.__tp357 = { parsePacket: parsePacket, cleanRows: cleanRows, MODES: MODES };
+})();
+</script>
+</body>
+</html>
